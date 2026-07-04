@@ -1,0 +1,11 @@
+{
+  "name": "exam-war-room-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page for Exam War Room — AI study companion for CBSE Class 10 students.",
+  "scripts": {
+    "build": "echo 'Static site — no build step needed.'",
+    "dev": "npx --yes serve@latest .",
+    "start": "npx --yes serve@latest ."
+  }
+}
