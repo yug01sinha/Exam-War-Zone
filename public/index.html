@@ -56,6 +56,12 @@
     overflow-x: hidden;
   }
 
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
   h1, h2, h3, h4 {
     font-family: 'Space Grotesk', 'Inter', sans-serif;
     color: var(--text);
@@ -850,6 +856,127 @@
     .nav-cta .btn:not(.btn-primary) { display: none; }
     .step .num { font-size: 90px; }
     .nav-inner { height: 64px; }
+  }
+
+  /* Additional responsive tweaks for better compatibility */
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: clamp(30px, 6vw, 50px);
+    }
+    .hero-sub {
+      font-size: 16px;
+    }
+    .hero-cta {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hero-cta .btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .hero-cta .btn:last-child {
+      margin-bottom: 0;
+    }
+    .section-head h2 {
+      font-size: clamp(24px, 4vw, 28px);
+    }
+    .section-head p {
+      font-size: 15px;
+    }
+    .float-card {
+      padding: 15px;
+    }
+    .float-title {
+      font-size: 13px;
+    }
+    .float-sub,
+    .float-body {
+      font-size: 12px;
+    }
+    .feature {
+      padding: 20px;
+    }
+    .feature h3 {
+      font-size: 17px;
+    }
+    .feature p {
+      font-size: 14px;
+    }
+    .step h3 {
+      font-size: 17px;
+    }
+    .step p {
+      font-size: 14px;
+    }
+    .pill {
+      padding: 12px 18px;
+      font-size: 14px;
+    }
+    .t-quote {
+      font-size: 14px;
+    }
+    .t-author .n {
+      font-size: 14px;
+    }
+    .t-author .l {
+      font-size: 12px;
+    }
+    .parents h2 {
+      font-size: clamp(24px, 4vw, 28px);
+    }
+    .parents li {
+      font-size: 15px;
+    }
+    .parents .check {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+    .plan {
+      padding: 25px;
+    }
+    .plan h3 {
+      font-size: 13px;
+    }
+    .plan .price .amt {
+      font-size: 36px;
+    }
+    .plan .price .per {
+      font-size: 12px;
+    }
+    .plan li {
+      font-size: 14px;
+    }
+    .plan .check {
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+    }
+    .final-cta h2 {
+      font-size: clamp(30px, 6vw, 50px);
+    }
+    .final-cta p {
+      font-size: 16px;
+    }
+    .final-cta .btn {
+      width: 100%;
+    }
+    footer .foot-grid {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    footer .foot-links {
+      margin-top: 20px;
+    }
+    .hero-logo {
+      width: 80px;
+      height: 80px;
+    }
+    .hero-logo img {
+      width: 50px;
+      height: 50px;
+    }
   }
 </style>
 </head>
