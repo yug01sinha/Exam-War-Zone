@@ -1108,9 +1108,79 @@
       height: 50px;
     }
   }
+/* Splash screen */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity .8s ease;
+}
+#splash-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-content {
+  text-align: center;
+}
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 16px;
+}
+.splash-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* Splash screen */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity .8s ease;
+}
+#splash-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-content {
+  text-align: center;
+}
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 16px;
+}
+.splash-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
 </style>
 </head>
 <body>
+
+  <div id="splash-screen" class="splash">
+    <div class="splash-content">
+      <img src="Logo.jpeg" alt="Exam War Room logo" class="splash-logo">
+      <div class="splash-name">ExamWarRoom</div>
+    </div>
+  </div>
 
   <!-- Skip link for keyboard users -->
   <a class="skip-link" href="#features">Skip to main content</a>
@@ -1628,6 +1698,18 @@
     }, { threshold: 0.4 });
     if (stats.length) sIO.observe(stats[0].closest('.stats-grid') || stats[0]);
   })();
+// Splash screen hide after delay
+document.addEventListener('DOMContentLoaded', function () {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    setTimeout(() => {
+      splash.classList.add('fade-out');
+      splash.addEventListener('transitionend', function e() {
+        splash.remove();
+      }, { once: true });
+    }, 1500); // 1.5 seconds
+  }
+});
 </script>
 </body>
 </html>
