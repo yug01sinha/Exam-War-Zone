@@ -847,6 +847,10 @@
     .hero-floats { grid-template-columns: 1fr 1fr; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .steps-grid::before { display: none; }
+    /* Adjust orbs for tablet */
+    .orb-1 { width: 350px; height: 350px; left: -80px; }
+    .orb-2 { width: 300px; height: 300px; right: -80px; }
+    .orb-3 { width: 250px; height: 250px; left: 25%; bottom: -80px; }
   }
   @media (max-width: 640px) {
     .section { padding: 72px 0; }
@@ -856,6 +860,127 @@
     .nav-cta .btn:not(.btn-primary) { display: none; }
     .step .num { font-size: 90px; }
     .nav-inner { height: 64px; }
+    /* Increase hero top padding for mobile */
+    .hero { padding-top: 100px; }
+    /* Adjust orbs for mobile */
+    .orb-1 { width: 250px; height: 250px; left: -50px; }
+    .orb-2 { width: 200px; height: 200px; right: -50px; }
+    .orb-3 { width: 150px; height: 150px; left: 15%; bottom: -50px; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: clamp(30px, 6vw, 50px);
+    }
+    .hero-sub {
+      font-size: 16px;
+    }
+    .hero-cta {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hero-cta .btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .hero-cta .btn:last-child {
+      margin-bottom: 0;
+    }
+    .section-head h2 {
+      font-size: clamp(24px, 4vw, 28px);
+    }
+    .section-head p {
+      font-size: 15px;
+    }
+    .float-card {
+      padding: 15px;
+    }
+    .float-title {
+      font-size: 13px;
+    }
+    .float-sub,
+    .float-body {
+      font-size: 12px;
+    }
+    .feature {
+      padding: 20px;
+    }
+    .feature h3 {
+      font-size: 17px;
+    }
+    .feature p {
+      font-size: 14px;
+    }
+    .step h3 {
+      font-size: 17px;
+    }
+    .step p {
+      font-size: 14px;
+    }
+    .pill {
+      padding: 12px 18px;
+      font-size: 14px;
+    }
+    .t-quote {
+      font-size: 14px;
+    }
+    .t-author .n {
+      font-size: 14px;
+    }
+    .t-author .l {
+      font-size: 12px;
+    }
+    .parents h2 {
+      font-size: clamp(24px, 4vw, 28px);
+    }
+    .parents li {
+      font-size: 15px;
+    }
+    .parents .check {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+    .plan {
+      padding: 25px;
+    }
+    .plan h3 {
+      font-size: 13px;
+    }
+    .plan .price .amt {
+      font-size: 36px;
+    }
+    .plan .price .per {
+      font-size: 12px;
+    }
+    .plan li {
+      font-size: 14px;
+    }
+    .plan .check {
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+    }
+    .final-cta h2 {
+      font-size: clamp(30px, 6vw, 50px);
+    }
+    .final-cta p {
+      font-size: 16px;
+    }
+    .final-cta .btn {
+      width: 100%;
+    }
+    footer .foot-grid {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    footer .foot-links {
+      margin-top: 20px;
+    }
+    /* Further adjust orbs for very small screens */
+    .orb-1 { width: 200px; height: 200px; left: -30px; }
+    .orb-2 { width: 150px; height: 150px; right: -30px; }
+    .orb-3 { width: 100px; height: 100px; left: 10%; bottom: -30px; }
   }
 
   /* Additional responsive tweaks for better compatibility */
