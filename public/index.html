@@ -1108,11 +1108,14 @@
       height: 50px;
     }
   }
-/* Splash screen */
+/* Splash screen enhancements */
 #splash-screen {
   position: fixed;
   inset: 0;
-  background: var(--bg);
+  background: linear-gradient(135deg,
+    rgba(108, 99, 255, 0.02) 0%,
+    rgba(108, 99, 255, 0.05) 100%); /* Subtle purple tint */
+  backdrop-filter: blur(4px); /* Soft blur effect */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1126,38 +1129,41 @@
 }
 .splash-content {
   text-align: center;
-}
-.splash-logo {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 16px;
-}
-.splash-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-
-/* Splash screen */
-#splash-screen {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 1;
-  transition: opacity .8s ease;
-}
-#splash-screen.fade-out {
   opacity: 0;
-  pointer-events: none;
+  transform: scale(0.95);
+  animation: splashFadeInScale 0.6s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.splash-content {
-  text-align: center;
+/* Entrance animation: fade-in + scale-up */
+@keyframes splashFadeInScale {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* Loading spinner */
+.splash-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(108, 99, 255, 0.2);
+  border-top-color: var(--primary); /* #6C63FF */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 16px auto 0;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* Fallback message */
+.splash-fallback {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-body);
+  opacity: 0.7;
+  animation: fadeIn 0.3s ease-out;
+  display: none;
 }
 .splash-logo {
   width: 120px;
@@ -1179,6 +1185,10 @@
     <div class="splash-content">
       <img src="Logo.jpeg" alt="Exam War Room logo" class="splash-logo">
       <div class="splash-name">ExamWarRoom</div>
+      <div class="splash-spinner" aria-label="Loading"></div>
+      <div class="splash-fallback" id="splash-fallback">
+        Still loading...
+      </div>
     </div>
   </div>
 
@@ -1698,19 +1708,74 @@
     }, { threshold: 0.4 });
     if (stats.length) sIO.observe(stats[0].closest('.stats-grid') || stats[0]);
   })();
-// Splash screen hide after delay
-document.addEventListener('DOMContentLoaded', function() {
+// Splash screen control with loading state management
+document.addEventListener('DOMContentLoaded', function () {
   const splash = document.getElementById('splash-screen');
+  const fallback = document.getElementById('splash-fallback');
+
   if (!splash) return;
 
-  // Wait for 1.5 seconds then start fading out
-  setTimeout(() => {
+  // Minimum display time (1.5s) + maximum wait time (8s total)
+  const MIN_DISPLAY_TIME = 1500;
+  const MAX_WAIT_TIME = 8000;
+
+  let isContentReady = false;
+
+  // Simulate content readiness check (in real app, this would be based on actual data loading)
+  function checkContentReady() {
+    // For static site: consider content ready when DOM is ready + images loaded
+    return document.readyState === 'complete' &&
+           [...document.images].every(img => img.complete);
+  }
+
+  // Check periodically for content readiness
+  const checkInterval = setInterval(() => {
+    if (checkContentReady()) {
+      isContentReady = true;
+      clearInterval(checkInterval);
+    }
+  }, 100);
+
+  // Handle timeout/fallback
+  const timeoutId = setTimeout(() => {
+    if (!isContentReady) {
+      fallback.style.display = 'block';
+    }
+    clearInterval(checkInterval);
+  }, MAX_WAIT_TIME);
+
+  // Start fade-out sequence when ready or timed out
+  function startFadeOut() {
+    clearTimeout(timeoutId);
+    clearInterval(checkInterval);
+
+    // Hide fallback if showing
+    if (fallback) fallback.style.display = 'none';
+
+    // Start fade-out
     splash.classList.add('fade-out');
-    // Wait for the fade out transition to complete (0.8s) then remove
+
+    // Remove from DOM after transition
     setTimeout(() => {
       splash.remove();
-    }, 800); // matches the transition duration in CSS
-  }, 1500);
+    }, 800); // Matches CSS transition duration
+  }
+
+  // Trigger fade-out when: content ready OR min time passed
+  const readyChecker = setInterval(() => {
+    const timeElapsed = Date.now() - performance.timing.navigationStart;
+    if (isContentReady && timeElapsed > MIN_DISPLAY_TIME) {
+      clearInterval(readyChecker);
+      startFadeOut();
+    }
+  }, 100);
+
+  // Fallback: force fade-out after max time regardless
+  setTimeout(() => {
+    if (splash.parentNode) { // Still in DOM
+      startFadeOut();
+    }
+  }, MAX_WAIT_TIME);
 });
 </script>
 </body>
