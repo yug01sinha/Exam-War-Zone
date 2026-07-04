@@ -1699,16 +1699,18 @@
     if (stats.length) sIO.observe(stats[0].closest('.stats-grid') || stats[0]);
   })();
 // Splash screen hide after delay
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
   const splash = document.getElementById('splash-screen');
-  if (splash) {
+  if (!splash) return;
+
+  // Wait for 1.5 seconds then start fading out
+  setTimeout(() => {
+    splash.classList.add('fade-out');
+    // Wait for the fade out transition to complete (0.8s) then remove
     setTimeout(() => {
-      splash.classList.add('fade-out');
-      splash.addEventListener('transitionend', function e() {
-        splash.remove();
-      }, { once: true });
-    }, 1500); // 1.5 seconds
-  }
+      splash.remove();
+    }, 800); // matches the transition duration in CSS
+  }, 1500);
 });
 </script>
 </body>
