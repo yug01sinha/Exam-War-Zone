@@ -1,6 +1,5 @@
 {
   "name": "exam-war-room-landing",
-<<<<<<< HEAD
   "version": "0.1.0",
   "private": true,
   "description": "Landing page for Exam War Room — AI study companion for CBSE Class 10 students with Supabase authentication",
@@ -26,14 +25,5 @@
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5"
-=======
-  "version": "1.0.0",
-  "private": true,
-  "description": "Landing page for Exam War Room — AI study companion for CBSE Class 10 students.",
-  "scripts": {
-    "build": "echo 'Static site — no build step needed.'",
-    "dev": "npx --yes serve@latest .",
-    "start": "npx --yes serve@latest ."
->>>>>>> de900186355917a12d480e6ec83843c3cb295e90
   }
 }
