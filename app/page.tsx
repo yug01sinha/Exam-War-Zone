@@ -16,7 +16,7 @@ export default function Home() {
         router.push('/dashboard');
       }
     });
-  }, [supabase, router]);
+  }, [router, supabase]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -30,13 +30,19 @@ export default function Home() {
             href="/login"
             className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
-            Sign In
+            Get started free
+            <span className="btn-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
           </Link>
           <Link
-            href="/signup"
+            href="/how"
             className="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50"
           >
-            Sign Up
+            <span className="btn-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,5 8,19 19,12"/></svg>
+            </span>
+            See how it works
           </Link>
         </div>
       </div>
