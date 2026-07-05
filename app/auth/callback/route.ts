@@ -8,7 +8,8 @@ export async function GET(request: Request) {
   const next = requestUrl.searchParams.get('next') ?? '/';
 
   if (code) {
-    const cookieStore = cookies();
+    // Added 'await' here to resolve the Next.js async cookies Promise
+    const cookieStore = await cookies();
     const supabase = createServerClient(cookieStore);
     await supabase.auth.exchangeCodeForSession(code);
   }
