@@ -72,15 +72,20 @@ export default function SignUp() {
       } else {
         // Check if email confirmation is required
         if (data.user) {
-          // If user exists but not confirmed, show message
-          if (!data.user.email_confirmed_at) {
-            setSuccess(
-              'Check your email to confirm your account. Please check your inbox (and spam folder).'
-            );
+          // If user exists but identities array is empty, it means email already registered (email confirmation enabled)
+          if (!data.user.identities || data.user.identities.length === 0) {
+            setError('This email is already registered. Please sign in instead.');
           } else {
-            // If auto-confirmed (email confirmation disabled), sign in
-            setSuccess('Account created! Redirecting...');
-            setTimeout(() => router.push('/dashboard'), 1500);
+            // User exists with identities -> new sign up
+            if (!data.user.email_confirmed_at) {
+              setSuccess(
+                'Check your email to confirm your account. Please check your inbox (and spam folder).'
+              );
+            } else {
+              // If auto-confirmed (email confirmation disabled), sign in
+              setSuccess('Account created! Redirecting...');
+              setTimeout(() => router.push('/dashboard'), 1500);
+            }
           }
         }
       }
