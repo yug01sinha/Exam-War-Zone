@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "Bash(npm install *)",
+      "Bash(npm create *)",
+      "Bash(npx create-next-app@latest *)",
+      "Bash(cp -r /tmp/examwarroom/* .)",
+      "Bash(cp -r /tmp/examwarroom/.[!.]* .)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}

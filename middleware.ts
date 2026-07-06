@@ -1,23 +1,30 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import { cookies } from 'next/headers';
 
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-  try {
-    const supabase = createServerClient(request.cookies);
+  // Get cookie store that allows reading and setting cookies (for request and response)
+  const cookieStore = await cookies();
 
-    // Refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-    await supabase.auth.getUser();
+  const adaptedCookieStore = {
+    get(name: string) {
+      const cookie = cookieStore.get(name);
+      return cookie ? cookie.value : null;
+    },
+    set(name: string, value: string, options: any) {
+      cookieStore.set({ name, value, ...options });
+    },
+    delete(name: string, options: any) {
+      cookieStore.delete({ name, ...options });
+    },
+  };
 
-    const response = NextResponse.next();
-    return response;
-  } catch (e) {
-    // If you are here, the Supabase client could not be initialized
-    // This is likely due to missing environment variables
-    return NextResponse.next();
-  }
+  const supabase = createServerClient(adaptedCookieStore);
+  await supabase.auth.getUser();
+
+  // If session changed, we may need to set cookies etc. supabase already handled via set/delete.
+  return NextResponse.next();
 }
 
 // See "Matching Paths" below to learn more
@@ -26,7 +33,7 @@ export const config = {
     /*
      * Match all request paths except:
      * - _next/static (static files)
-     * - _next/image (image optimization)
+     * - _next/image (image optimization files)
      * - favicon.ico (favicon icon)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Feel free to modify this pattern to include more paths.

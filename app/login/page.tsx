@@ -1,12 +1,27 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@/lib/supabase';
 
+// Component to check for error in URL using Suspense
+function UrlErrorChecker() {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get('error');
+
+  if (urlError === 'invalid_token') {
+    return (
+      <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+        Invalid or expired password reset link. Please request a new one.
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export default function Login() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
   const [formState, setFormState] = useState({
     email: '',
@@ -14,9 +29,6 @@ export default function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Check for error in URL
-  const urlError = searchParams.get('error');
 
   // Handle form changes
   const handleChange = (
@@ -81,11 +93,9 @@ export default function Login() {
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Sign In to Your Account
         </h2>
-        {urlError === 'invalid_token' && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
-            Invalid or expired password reset link. Please request a new one.
-          </div>
-        )}
+        <Suspense fallback={<div></div>}>
+          <UrlErrorChecker />
+        </Suspense>
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -146,9 +156,9 @@ export default function Login() {
             </a>
           </div>
           <p className="text-sm text-center text-gray-500">
-            Don't have an account?{' '}
-            <a href="/signup" className="font-medium text-indigo-600 hover:underline">
-              Sign Up
+            Already have an account?{' '}
+            <a href="/login" className="font-medium text-indigo-600 hover:underline">
+              Sign In
             </a>
           </p>
         </form>

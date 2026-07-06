@@ -3,7 +3,20 @@ import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 
 export default async function Dashboard() {
-  const supabase = createServerClient();
+  const cookieStore = await cookies();
+  const adaptedCookieStore = {
+    get(name: string) {
+      const cookie = cookieStore.get(name);
+      return cookie ? cookie.value : null;
+    },
+    set(name: string, value: string, options: any) {
+      cookieStore.set({ name, value, ...options });
+    },
+    delete(name: string, options: any) {
+      cookieStore.delete({ name, ...options });
+    },
+  };
+  const supabase = createServerClient(adaptedCookieStore);
 
   // Get session on server side
   const {
@@ -12,7 +25,7 @@ export default async function Dashboard() {
 
   // If no session, redirect to login
   if (!session) {
-    redirect('/login');
+    return redirect('/login');
   }
 
   // Get user data
@@ -48,7 +61,7 @@ export default async function Dashboard() {
                 <button
                   onClick={async () => {
                     await supabase.auth.signOut();
-                    redirect('/login');
+                    return redirect('/login');
                   }}
                   className="px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 >
@@ -68,7 +81,7 @@ export default async function Dashboard() {
                 Welcome to your dashboard
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Your personalized study space for CBSE Class 10 preparation
+                Your personalized space for CBSE Class 10 preparation
               </p>
             </div>
             <div className="px-6 py-4 space-y-6">

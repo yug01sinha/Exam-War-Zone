@@ -8,9 +8,20 @@ export async function GET(request: Request) {
   const next = requestUrl.searchParams.get('next') ?? '/';
 
   if (code) {
-    // Added 'await' here to resolve the Next.js async cookies Promise
     const cookieStore = await cookies();
-    const supabase = createServerClient(cookieStore);
+    const adaptedCookieStore = {
+      get(name: string) {
+        const cookie = cookieStore.get(name);
+        return cookie ? cookie.value : null;
+      },
+      set(name: string, value: string, options: any) {
+        cookieStore.set({ name, value, ...options });
+      },
+      delete(name: string, options: any) {
+        cookieStore.delete({ name, ...options });
+      },
+    };
+    const supabase = createServerClient(adaptedCookieStore);
     await supabase.auth.exchangeCodeForSession(code);
   }
 
