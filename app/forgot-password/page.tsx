@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@/lib/supabase';
@@ -36,18 +38,18 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-center text-2xl font-bold text-gray-800">Reset Your Password</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-800">Forgot Password</h2>
         <p className="text-center text-gray-600">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email to receive a password reset link.
         </p>
-        {message && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded text-green-800 text-sm">
-            {message}
-          </div>
-        )}
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
             {error}
+          </div>
+        )}
+        {message && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded text-green-800 text-sm">
+            {message}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">

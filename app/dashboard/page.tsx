@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { cookies } from 'next/headers';
 import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
@@ -17,8 +19,6 @@ export default async function Dashboard() {
     },
   };
   const supabase = createServerClient(adaptedCookieStore);
-
-  // Get session on server side
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -28,7 +28,6 @@ export default async function Dashboard() {
     return redirect('/login');
   }
 
-  // Get user data
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -56,7 +55,8 @@ export default async function Dashboard() {
             <div className="flex-shrink-0 flex items-center">
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium text-gray-700">
-                  {user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
+                  {user?.user_metadata?.name || user?.email?.split('@')[0] ||
+                    'User'}
                 </span>
                 <button
                   onClick={async () => {
