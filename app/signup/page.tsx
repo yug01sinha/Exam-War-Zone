@@ -30,28 +30,32 @@ export default function SignUp() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setLoading(true);
 
     const { name, email, password, confirmPassword } = formState;
 
     // Client-side validation
     if (!name.trim()) {
       setError('Name is required');
+      setLoading(false);
       return;
     }
     if (!email.includes('@')) {
       setError('Please enter a valid email');
+      setLoading(false);
       return;
     }
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
+      setLoading(false);
       return;
     }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -70,24 +74,11 @@ export default function SignUp() {
           setError(signUpError.message);
         }
       } else {
-        // Check if email confirmation is required
-        if (data.user) {
-          // If user exists but identities array is empty, it means email already registered (email confirmation enabled)
-          if (!data.user.identities || data.user.identities.length === 0) {
-            setError('This email is already registered. Please sign in instead.');
-          } else {
-            // User exists with identities -> new sign up
-            if (!data.user.email_confirmed_at) {
-              setSuccess(
-                'Check your email to confirm your account. Please check your inbox (and spam folder).'
-              );
-            } else {
-              // If auto-confirmed (email confirmation disabled), sign in
-              setSuccess('Account created! Redirecting...');
-              setTimeout(() => router.push('/dashboard'), 1500);
-            }
-          }
-        }
+        // Regardless of email confirmation, redirect to onboarding to set up profile
+        setSuccess('Account created! Please complete your setup...');
+        setTimeout(() => {
+          router.push('/onboarding');
+        }, 1500);
       }
     } catch (err: any) {
       setError(err.message);
@@ -99,20 +90,13 @@ export default function SignUp() {
   const handleGoogleSignIn = async () => {
     setError(null);
     setSuccess(null);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) {
-        setError(error.message);
-      }
-      // signInWithOAuth will redirect the user to Google and back automatically
-    } catch (err: any) {
-      setError(err.message);
-    }
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    // signInWithOAuth will redirect the user to Google and back automatically
   };
 
   return (

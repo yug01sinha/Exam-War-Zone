@@ -43,9 +43,10 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
+
     const { email, password } = formState;
 
-    setLoading(true);
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -61,8 +62,20 @@ export default function Login() {
           setError(signInError.message);
         }
       } else {
-        // Redirect to dashboard or intended page
-        router.push('/dashboard');
+        // Check if onboarding is completed
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('onboarding_completed')
+          .eq('user_id', data.user.id)
+          .single();
+
+        if (profileError || !profile?.onboarding_completed) {
+          // Redirect to onboarding if not completed
+          router.push('/onboarding');
+        } else {
+          // Redirect to dashboard if completed
+          router.push('/dashboard');
+        }
       }
     } catch (err: any) {
       setError(err.message);
@@ -73,20 +86,13 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     setError(null);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) {
-        setError(error.message);
-      }
-      // signInWithOAuth will redirect the user to Google and back automatically
-    } catch (err: any) {
-      setError(err.message);
-    }
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    // signInWithOAuth will redirect the user to Google and back automatically
   };
 
   return (
