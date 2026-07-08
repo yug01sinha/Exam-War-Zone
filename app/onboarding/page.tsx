@@ -38,17 +38,30 @@ export default async function OnboardingPage() {
   }
 
   // Check if user has completed onboarding
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('onboarding_completed')
-    .eq('user_id', user.id)
-    .single();
+  type Profile = { onboarding_completed: boolean };
+  let profile: Profile | null = null;
+  let profileError = null;
+  try {
+    const { data: profileData, error: profileErr } = await supabase
+      .from('user_profiles')
+      .select('onboarding_completed')
+      .eq('user_id', user.id)
+      .maybeSingle<Profile>();
 
-  // If profile exists and onboarding is completed, redirect to dashboard
-  if (profile && profile.onboarding_completed) {
-    return redirect('/dashboard');
+    profile = profileData;
+    profileError = profileErr;
+  } catch (err: any) {
+    profileError = err;
   }
 
-  // Otherwise, show the onboarding form
-  return <OnboardingForm userId={user.id} />;
+  if (profileError) {
+    // Unexpected error, redirect to onboarding (safe fallback)
+    return redirect('/onboarding');
+  } else if (profile && profile.onboarding_completed) {
+    // Profile exists and onboarding completed -> redirect to dashboard
+    return redirect('/dashboard');
+  } else {
+    // Either no profile exists or onboarding not completed -> show the form
+    return <OnboardingForm userId={user.id} />;
+  }
 }

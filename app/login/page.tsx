@@ -63,17 +63,33 @@ export default function Login() {
         }
       } else {
         // Check if onboarding is completed
-        const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('onboarding_completed')
-          .eq('user_id', data.user.id)
-          .single();
+        type Profile = { onboarding_completed: boolean };
+        let profile: Profile | null = null;
+        let profileError = null;
+        try {
+          const { data: profileData, error: profileErr } = await supabase
+            .from('user_profiles')
+            .select('onboarding_completed')
+            .eq('user_id', data.user.id)
+            .maybeSingle<Profile>();
 
-        if (profileError || !profile?.onboarding_completed) {
-          // Redirect to onboarding if not completed
+          profile = profileData;
+          profileError = profileErr;
+        } catch (err: any) {
+          profileError = err;
+        }
+
+        if (profileError) {
+          // Unexpected error, show it
+          setError('Failed to check profile: ' + (profileError.message || String(profileError)));
+        } else if (!profile) {
+          // No profile exists yet (new user)
+          router.push('/onboarding');
+        } else if (!profile.onboarding_completed) {
+          // Profile exists but onboarding not completed
           router.push('/onboarding');
         } else {
-          // Redirect to dashboard if completed
+          // Profile exists and onboarding completed
           router.push('/dashboard');
         }
       }
@@ -132,7 +148,7 @@ export default function Login() {
               required
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <button
             type="submit"
             disabled={loading}

@@ -1,5 +1,4 @@
-import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient as createSupabaseServerClient, createBrowserClient } from '@supabase/ssr';
 
 /**
  * Creates a Supabase server client adapted from a cookie store.
@@ -35,9 +34,14 @@ export const createServerClient = (cookieStore: {
   );
 };
 
-export const createClientComponentClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+let clientComponentClient: ReturnType<typeof createBrowserClient> | null = null;
 
-  return createClient(supabaseUrl, supabaseAnonKey);
+export const createClientComponentClient = () => {
+  if (clientComponentClient === null) {
+    clientComponentClient = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }
+  return clientComponentClient;
 };

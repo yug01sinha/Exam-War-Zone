@@ -24,7 +24,7 @@ export default function OnboardingForm({ userId }: Props) {
   const handleNext = () => {
     setError(null);
     if (step === 1) {
-      if (subjects.length === 0) {
+      if (strongSubjects.length === 0) {
         setError('Please select at least one strong subject');
         return;
       }
@@ -72,20 +72,30 @@ export default function OnboardingForm({ userId }: Props) {
         return;
       }
 
-      // Upsert the user profile
-      const { error: upsertError } = await supabase
-        .from('user_profiles')
-        .upsert(
-          {
-            user_id: userId,
-            strong_subjects: strongSubjects,
-            weak_subjects: weakSubjects,
-            daily_study_time_minutes: dailyStudyTime,
-            onboarding_completed: true,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        );
+      // Define the shape for insert/update (only columns we are setting)
+      type UserProfileInsert = {
+        user_id: string;
+        strong_subjects: string[];
+        weak_subjects: string[];
+        daily_study_time_minutes: number;
+        onboarding_completed: boolean;
+        updated_at: string;
+      };
+
+      // Prepare the user profile object for upsert
+      const userProfile: UserProfileInsert = {
+        user_id: userId,
+        strong_subjects: strongSubjects,
+        weak_subjects: weakSubjects,
+        daily_study_time_minutes: Number(dailyStudyTime),
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Use type assertion to bypass Supabase typing issues
+      const userProfilesTable = supabase.from('user_profiles') as any;
+      const { error: upsertError } = await userProfilesTable
+        .upsert([userProfile], { onConflict: 'user_id' });
 
       if (upsertError) throw upsertError;
 

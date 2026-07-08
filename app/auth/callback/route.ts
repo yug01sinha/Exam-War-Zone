@@ -31,18 +31,36 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('onboarding_completed')
-        .eq('user_id', user.id)
-        .single();
+      type Profile = { onboarding_completed: boolean };
+      let profile: Profile | null = null;
+      let profileError = null;
+      try {
+        const { data: profileData, error: profileErr } = await supabase
+          .from('user_profiles')
+          .select('onboarding_completed')
+          .eq('user_id', user.id)
+          .maybeSingle<Profile>();
 
-      // If profile exists and onboarding is completed, go to dashboard
-      // Otherwise, go to onboarding
-      if (profile && profile.onboarding_completed) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
-      } else {
+        profile = profileData;
+        profileError = profileErr;
+      } catch (err: any) {
+        profileError = err;
+      }
+
+      if (profileError) {
+        // Log the error (in a real app, you might want to log to an error monitoring service)
+        console.error('Failed to check profile in callback:', profileError);
+        // In case of error, we'll treat as if onboarding is not completed and redirect to onboarding
         return NextResponse.redirect(new URL('/onboarding', request.url));
+      } else if (!profile) {
+        // No profile exists yet (new user)
+        return NextResponse.redirect(new URL('/onboarding', request.url));
+      } else if (!profile.onboarding_completed) {
+        // Profile exists but onboarding not completed
+        return NextResponse.redirect(new URL('/onboarding', request.url));
+      } else {
+        // Profile exists and onboarding completed
+        return NextResponse.redirect(new URL('/dashboard', request.url));
       }
     }
   }
