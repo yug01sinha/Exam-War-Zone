@@ -33,9 +33,11 @@ export default function FocusAreas() {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className={`bg-white rounded-lg shadow-md p-6 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
       <div className="mb-4">
-        <h3 className="text-lg font-semibold \text-gray-900">Focus Areas</h3>
+        <h2 className="text-xl font-bold text-gray-900">
+          Focus Areas
+        </h2>
         <p className="mt-1 text-sm text-gray-500">
           Topics that need attention based on your practice
         </p>
@@ -50,8 +52,9 @@ export default function FocusAreas() {
             }`}
           >
             {/* Subject badge */}
+            {/* Subject badge */}
             <div
-              className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${area.color}-100 text-${area.color}-800`}
+              className={`px-2 py-0.5 text-xs font-medium rounded-full rounded-full  font-semibold-letter-spacing:medium rounded-full bg-${area.color}-100 text-${area.color}-800`}
             >
               {area.subject}
             </div>
@@ -63,21 +66,19 @@ export default function FocusAreas() {
 
             {/* Confidence meter */}
             <div className="w-20">
-              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden relative">
                 <div
-                  className={`h-full bg-gradient-to-r from-${area.color}-500 to-${area.color}-400 transition-width duration-1000 ease-out ${
+                  className={`h-full bg-gradient-to-r from-${area.color}-500 to-${area.color}-400 transition-all duration-500 ease-out ${
                     visibleItems.includes(index)
                       ? `w-[${area.confidence}%]`
                       : 'w-0'
                   }`}
                 ></div>
               </div>
+              <p className="mt-0.5 text-xs text-gray-500 text-center">
+                {area.confidence}%
+              </p>
             </div>
-
-            {/* Confidence percentage */}
-            <p className="text-xs text-${area.color}-600 font-medium ml-2">
-              {area.confidence}%
-            </p>
           </div>
         ))}
       </div>

@@ -4,7 +4,6 @@ import { createServerClient } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 
 export async function middleware(request: NextRequest) {
-  // Get cookie store that allows reading and setting cookies (for request and response)
   const cookieStore = await cookies();
 
   const adaptedCookieStore = {
@@ -21,23 +20,33 @@ export async function middleware(request: NextRequest) {
   };
 
   const supabase = createServerClient(adaptedCookieStore);
-  await supabase.auth.getUser();
 
-  // If session changed, we may need to set cookies etc. supabase already handled via set/delete.
+  // Admin route protection
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('user_id', user.id)
+      .maybeSingle<{ is_admin: boolean }>();
+
+    if (!profile?.is_admin) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // Refresh session for all routes
+  await supabase.auth.getUser();
   return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon icon)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

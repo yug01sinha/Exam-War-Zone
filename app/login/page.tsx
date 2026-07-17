@@ -71,9 +71,9 @@ export default function Login() {
             .from('user_profiles')
             .select('onboarding_completed')
             .eq('user_id', data.user.id)
-            .maybeSingle<Profile>();
+            .maybeSingle();
 
-          profile = profileData;
+          profile = profileData as Profile || null;
           profileError = profileErr;
         } catch (err: any) {
           profileError = err;

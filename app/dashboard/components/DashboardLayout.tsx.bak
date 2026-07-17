@@ -1,0 +1,378 @@
+'use client';
+import { useEffect, useState } from 'react';
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [bootState, setBootState] = useState({
+    overlay: 'visible',
+    sidebar: 'hidden',
+    topbar: 'hidden',
+    panels: Array(3).fill('hidden') as const,
+  });
+
+  useEffect(() => {
+    const handleBootSequence = () => {
+      // Check for reduced motion preference
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reducedMotion) {
+        // Skip animation if reduced motion is preferred
+        setBootState({
+          overlay: 'hidden',
+          sidebar: 'visible',
+          topbar: 'visible',
+          panels: ['visible', 'visible', 'visible'] as const,
+        });
+        return;
+      }
+
+      // Boot sequence timing
+      setTimeout(() => {
+        setBootState(prev => ({
+          ...prev,
+          overlay: 'hidden',
+          sidebar: 'visible'
+        }));
+
+        setTimeout(() => {
+          setBootState(prev => ({
+            ...prev,
+            topbar: 'visible'
+          }));
+
+          setTimeout(() => {
+            setBootState(prev => ({
+              ...prev,
+              panels: ['visible', 'hidden', 'hidden'] as const
+            }));
+
+            setTimeout(() => {
+              setBootState(prev => ({
+                ...prev,
+                panels: ['visible', 'visible', 'hidden'] as const
+              }));
+
+              setTimeout(() => {
+                setBootState(prev => ({
+                  ...prev,
+                  panels: ['visible', 'visible', 'visible'] as const
+                }));
+              }, 220);
+            }, 220);
+          }, 220);
+        }, 200);
+      }, 1400); // Initial delay before starting sequence
+    };
+
+    handleBootSequence();
+
+    // Replay button handler
+    const replayBtn = document.getElementById('replayBtn');
+    const handleReplayClick = () => {
+      setBootState({
+        overlay: 'visible',
+        sidebar: 'hidden',
+        topbar: 'hidden',
+        panels: Array(3).fill('hidden') as const,
+      });
+
+      // Restart the boot sequence
+      setTimeout(() => {
+        setBootState(prev => ({
+          ...prev,
+          overlay: 'hidden',
+          sidebar: 'visible'
+        }));
+
+        setTimeout(() => {
+          setBootState(prev => ({
+            ...prev,
+            topbar: 'visible'
+          }));
+        }, 200);
+
+        setTimeout(() => {
+          setBootState(prev => ({
+            ...prev,
+            panels: ['visible', 'hidden', 'hidden'] as const
+          }));
+
+          setTimeout(() => {
+            setBootState(prev => ({
+              ...prev,
+              panels: ['visible', 'visible', 'hidden'] as const
+            }));
+
+            setTimeout(() => {
+              setBootState(prev => ({
+                ...prev,
+                panels: ['visible', 'visible', 'visible'] as const
+              }));
+            }, 220);
+          }, 220);
+        }, 220);
+      }, 200);
+    };
+
+    if (replayBtn) {
+      replayBtn.addEventListener('click', handleReplayClick);
+    }
+
+    return () => {
+      if (replayBtn) {
+        replayBtn.removeEventListener('click', handleReplayClick);
+      }
+    };
+  }, []);
+
+  const asideClass = 'sidebar fixed left-4 top-4 bottom-4 w-[248px] bg-[var(--ink)] rounded-2xl px-6 py-5 flex flex-col hidden sm:block lg:block';
+  const mainClass = 'app relative z-0 min-h-[calc(100vh-40px)] mx-4 sm:mx-6 lg:mx-8';
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Boot Overlay */}
+      <div
+        id="bootOverlay"
+        className={`fixed inset-0 z-50 flex items-center justify-center
+                  bg-gradient-to-br from-[#1c1a33] to-[#0d0c18]
+                  ${bootState.overlay === 'visible' ? 'opacity-100 visibility-visible' : 'opacity-0 visibility-hidden'}
+                  transition-all duration-600 ease-out`}
+      >
+        <div className="boot-mark relative w-[74px] h-[74px] rounded-3xl bg-gradient-to-tr from-indigo-500 via-violet-500 to-blue-500 flex items-center justify-center shadow-2xl animate-bootPulse">
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5Z"
+              fill="white"
+              fillOpacity="0.95"
+            />
+          </svg>
+        </div>
+        <div
+          className={`boot-label absolute bottom-10 font-mono text-xs tracking-wider text-white/45 uppercase
+                    ${bootState.overlay === 'hidden' ? 'opacity-0' : 'opacity-100'}
+                    transition-opacity duration-600 ease-out`}
+        >
+          Entering war room…
+        </div>
+      </div>
+
+      {/* Main App Container - Responsive Layout */}
+      <div className={mainClass}>
+        {/* Sidebar - Hidden at 880px and below (from reference) */}
+        <aside className={asideClass}>
+          {/* Brand */}
+          <div className="brand flex items-center gap-2.5 px-2 py-1 pb-6">
+            <div className="mark flex w-8 h-8 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 via-violet-500 to-blue-500">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+              >
+                <path
+                  d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5Z"
+                  fill="white"
+                  fillOpacity="0.9"
+                />
+              </svg>
+            </div>
+            <span className="name text-white font-bold text-sm">ExamWarRoom</span>
+          </div>
+
+          {/* Nav Items */}
+          <nav className="mt-2 space-y-1.5 flex-1">
+            {/* Dashboard - Active */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg bg-[var(--grad)] text-white shadow-[var(--shadow-sm)]"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                <rect x="3" y="16" width="7" height="5" rx="1.5" />
+              </svg>
+              Dashboard
+            </div>
+
+            {/* Learn */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+              </svg>
+              Learn
+            </div>
+
+            {/* Test */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+              Test
+              <span className="badge-count ml-auto font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full">2</span>
+            </div>
+
+            {/* Revise */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              Revise
+            </div>
+
+            {/* Group Zone */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Group Zone
+            </div>
+
+            {/* Settings */}
+            <div
+              className="nav-item flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a3 3 0 0 1 5.83 1c0 2-3 2-3 4" />
+                <path d="M12 17h.01" />
+              </svg>
+              Support
+            </div>
+          </nav>
+
+          {/* Spacer */}
+          <div className="nav-gap h-[18px]" />
+
+          {/* Sidebar Footer */}
+          <div className="sidebar-foot mt-auto">
+            <div
+              className="logout flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all duration-200"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWeight="2"
+                className="w-4 h-4"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="M16 17l5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+              Log out
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Column */}
+        <main className="main-col flex-1 flex flex-col gap-5 px-4 pt-4">
+          {children}
+        </main>
+
+        {/* Right Column - Hidden at 1280px and below (from reference) */}
+        <aside
+          className={`right-col hidden lg:block w-[340px] flex-shrink-0
+                     ${bootState.panels[0] === 'hidden' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                       ? 'opacity-0 translate-y-[20px] scale-[0.98]'
+                       : bootState.panels[0] === 'visible' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                         ? 'opacity-100 translate-y-0 scale-100'
+                         : 'opacity-100'}
+                     ${bootState.panels[1] === 'hidden' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                       ? 'opacity-0 translate-y-[20px] scale-[0.98]'
+                       : bootState.panels[1] === 'visible' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                         ? 'opacity-100 translate-y-0 scale-100'
+                         : 'opacity-100'}
+                     ${bootState.panels[2] === 'hidden' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                       ? 'opacity-0 translate-y-[20px] scale-[0.98]'
+                       : bootState.panels[2] === 'visible' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                         ? 'opacity-100 translate-y-0 scale-100'
+                         : 'opacity-100'}
+                     transition-all duration-[${bootState.panels.some(p => p === 'hidden') ? '550ms' : '500ms'} ease-out] 
+        >
+          {/* Right column content will be injected here via children or separate slot */}
+          {/* For now, we'll leave this empty as content is passed via children to main-col */}
+        </aside>
+      </div>
+
+      {/* Replay Button */}
+      <button
+        id="replayBtn"
+        title="Replay intro"
+        className={`replay-btn fixed bottom-4 right-4 z-40 w-10 h-10 rounded-lg bg-white border border-[var(--border)] flex items-center justify-center
+                 ${!window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                   ? 'transition-transform duration-200'
+                     : ''>`}
+          viewBox="0 0 24 24"
+      >
+      >
+          fill="none"
+          stroke="currentColor"
+          strokeWeight="2"
+          className="w-4 h-4 text-[var(--muted)]"
+        >
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+      </button>
+    </div>
+  );
+}

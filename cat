@@ -1,0 +1,5 @@
+lines = open('app/dashboard/components/DashboardLayout.tsx', 'r').readlines()
+# line numbers are 0-indexed
+lines[348] = '                     transition-all duration-[${bootState.panels.some(p => p === \'hidden\') ? \'550ms\' : \'500ms\'} ease-out] \n'
+lines[349] = '        }>\n'
+open('app/dashboard/components/DashboardLayout.tsx', 'w').writelines(lines)
